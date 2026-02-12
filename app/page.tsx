@@ -32,10 +32,17 @@ export default function AttendancePage() {
 
   // Handlers
   const handlePercentageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let val = Number(e.target.value);
-    if (val < 75) val = 75;
-    if (val > 100) val = 100;
-    setTargetPercentage(val);
+    const val = e.target.value;
+    
+    // Allow empty so you can delete, but don't force 75 yet
+    if (val === "") {
+      setTargetPercentage(0); 
+      return;
+    }
+
+    let num = Number(val);
+    if (num > 100) num = 100; // Keep the cap
+    setTargetPercentage(num);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,29 +123,56 @@ export default function AttendancePage() {
           </p>
         </header>
 
-        {/* Settings Control */}
-        <div className={`${theme.cardBg} p-4 rounded-2xl shadow-sm border-2 mb-6 flex items-center justify-between gap-4 transition-colors`}>
-            <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-800 text-cyan-400' : 'bg-yellow-300 text-slate-900'}`}>
-                    <Settings className="w-6 h-6" />
-                </div>
-                <div className="text-sm">
-                    <p className={`font-black uppercase tracking-wide ${theme.text}`}>Target %</p>
-                    <p className={`text-xs font-bold ${theme.subText}`}>Peru enthaayalum… percentage 75 venam</p>
-                </div>
-            </div>
-            <div className={`flex items-center gap-2 rounded-xl px-3 py-2 border-2 ${isDarkMode ? 'bg-black border-gray-700' : 'bg-slate-50 border-slate-200'}`}>
-                <input 
-                    type="number" 
-                    value={targetPercentage} 
-                    onChange={handlePercentageChange}
-                    className={`w-12 bg-transparent font-black text-xl text-right focus:outline-none ${theme.text}`}
-                    min="75"
-                    max="100"
-                />
-                <Percent className={`w-5 h-5 ${theme.subText}`} />
-            </div>
+        {/* Settings Control - The hybrid version (Type or Click) */}
+<div className={`${theme.cardBg} p-4 rounded-2xl shadow-sm border-2 mb-6 flex items-center justify-between gap-4 transition-colors`}>
+    <div className="flex items-center gap-3">
+        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-800 text-cyan-400' : 'bg-yellow-300 text-slate-900'}`}>
+            <Settings className="w-6 h-6" />
         </div>
+        <div className="text-sm">
+            <p className={`font-black uppercase tracking-wide ${theme.text}`}>Target %</p>
+            <p className={`text-xs font-bold ${theme.subText}`}>Peru enthaayalum… percentage 75 venam</p>
+        </div>
+    </div>
+
+    {/* Stepper + Direct Input Container */}
+    <div className={`flex items-center gap-1 rounded-xl px-2 py-1 border-2 transition-all ${isDarkMode ? 'bg-black border-gray-700 focus-within:border-cyan-400' : 'bg-slate-50 border-slate-200 focus-within:border-blue-500'}`}>
+        
+        {/* Minus Button - For quick clicks */}
+        <button 
+          type="button" 
+          onClick={() => setTargetPercentage(prev => Math.max(75, prev - 1))}
+          className={`p-2 hover:bg-gray-800 rounded-lg font-bold text-xl transition-colors ${isDarkMode ? 'text-cyan-400' : 'text-blue-600'}`}
+        >
+          −
+        </button>
+
+        {/* Direct Input - For when clicking is boring */}
+        <input 
+            type="number" 
+            inputMode="decimal"
+            value={targetPercentage === 0 ? "" : targetPercentage} 
+            onChange={handlePercentageChange}
+            onFocus={(e) => e.target.select()} // Selects all on tap so you can just type a new number
+            onBlur={() => {
+                // Safety check: if they type something crazy or leave it blank
+                if (targetPercentage < 75) setTargetPercentage(75);
+            }}
+            className={`w-10 bg-transparent font-black text-xl text-center focus:outline-none ${theme.text} [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+        />
+
+        {/* Plus Button - For quick clicks */}
+        <button 
+          type="button" 
+          onClick={() => setTargetPercentage(prev => Math.min(100, prev + 1))}
+          className={`p-2 hover:bg-gray-800 rounded-lg font-bold text-xl transition-colors ${isDarkMode ? 'text-cyan-400' : 'text-blue-600'}`}
+        >
+          +
+        </button>
+        
+        <Percent className={`w-4 h-4 mr-1 ${theme.subText}`} />
+    </div>
+</div>
 
         {/* Upload Section */}
         {data.length === 0 && (
