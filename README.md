@@ -26,6 +26,14 @@
 
 This tool is a personal project for **private use among friends**. It is specifically designed to understand the table structure (Subject, Held, Attended, %) found in our specific college reports.
 
+## 🧪 How to Test It
+
+> **⚠️ Note:** This tool is strictly programmed for our college's specific PDF format.
+
+If you want to test the UI/Vibe (and you aren't from my college), I have attached a **Sample Attendance Report** in this GitHub repository.
+
+**Download it and upload it to the app to see the magic happen!**
+
 ### ❤️ Credits
 
 **Made with ❤️ by Prohaneen.**
